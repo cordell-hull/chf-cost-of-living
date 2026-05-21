@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cost of Living Estimate - Cordell Hull Foundation</title>
+  <link rel="icon" type="image/jpeg" href="./assets/logo.jpeg">
+  <link rel="stylesheet" href="styles.css?v=2.1.0">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Organization Logo and Name -->
+    <div class="org-header">
+      <img src="./assets/logo.jpeg" alt="Cordell Hull Foundation Logo" class="org-logo">
+      <span class="org-name">Cordell Hull Foundation for International Education</span>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <h1 id="schoolNameHeader" class="school-name-header"></h1>
+      <h2>Cost of Living Estimate</h2>
+    </header>
+
+    <!-- Progress Indicator -->
+    <nav class="wizard-progress" aria-label="Form progress">
+      <ol class="progress-steps">
+        <li class="progress-step active" data-step="1">
+          <span class="step-number">1</span>
+          <span class="step-label">School</span>
+        </li>
+        <li class="progress-step" data-step="2">
+          <span class="step-number">2</span>
+          <span class="step-label">Insurance</span>
+        </li>
+        <li class="progress-step" data-step="3">
+          <span class="step-number">3</span>
+          <span class="step-label">Food</span>
+        </li>
+        <li class="progress-step" data-step="4">
+          <span class="step-number">4</span>
+          <span class="step-label">Tax</span>
+        </li>
+        <li class="progress-step" data-step="5">
+          <span class="step-number">5</span>
+          <span class="step-label">Housing</span>
+        </li>
+        <li class="progress-step" data-step="6">
+          <span class="step-number">6</span>
+          <span class="step-label">Transport</span>
+        </li>
+        <li class="progress-step" data-step="7">
+          <span class="step-number">7</span>
+          <span class="step-label">Fun</span>
+        </li>
+        <li class="progress-step" data-step="8">
+          <span class="step-number">8</span>
+          <span class="step-label">Review</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="wizard-content">
+
+      <!-- Step 1: School Information -->
+      <section class="wizard-step active" data-step="1">
+        <h2>School Information</h2>
+        <p class="step-description">Provide the school and contact details.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City <span class="required">*</span></label>
+            <input type="text" id="city" placeholder="e.g., Tampa" required>
+            <span class="field-error" id="cityError"></span>
+          </div>
+          <div class="form-group">
+            <label for="state">State <span class="required">*</span></label>
+            <select id="state" required>
+              <!-- Options populated by JS -->
+            </select>
+            <span class="field-error" id="stateError"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="schoolName">Name of School <span class="required">*</span></label>
+          <input type="text" id="schoolName" placeholder="e.g., The French American School of Tampa Bay" required>
+          <span class="field-error" id="schoolNameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="schoolAddress">Address of School <span class="required">*</span></label>
+          <input type="text" id="schoolAddress" placeholder="e.g., 123 Main St, Tampa, FL 33601">
+          <span class="field-error" id="schoolAddressError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="contactName">Contact Name <span class="required">*</span></label>
+          <input type="text" id="contactName" placeholder="e.g., Jane Smith">
+          <span class="field-error" id="contactNameError"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactEmail">Email Address <span class="required">*</span></label>
+            <input type="email" id="contactEmail" placeholder="e.g., contact@school.edu">
+            <span class="field-error" id="contactEmailError"></span>
+          </div>
+          <div class="form-group">
+            <label for="contactPhone">Phone Number <span class="required">*</span></label>
+            <input type="tel" id="contactPhone" placeholder="e.g., (555) 123-4567">
+            <span class="field-error" id="contactPhoneError"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2: Health Insurance -->
+      <section class="wizard-step" data-step="2">
+        <h2>Health Insurance</h2>
+        <p class="step-description">Health insurance information for exchange teachers.</p>
+
+        <div class="form-group">
+          <label>Does the school offer health insurance to teachers? <span class="required">*</span></label>
+          <div class="toggle-group" id="schoolOffersInsurance">
+            <button type="button" class="toggle-btn" data-value="yes">Yes</button>
+            <button type="button" class="toggle-btn" data-value="no">No</button>
+          </div>
+          <span class="field-error" id="insuranceToggleError"></span>
+
+          <div class="conditional-field" id="insuranceCostField">
+            <div class="form-group">
+              <label for="insuranceMonthlyCost">Cost per month to the teacher <span class="required">*</span></label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="insuranceMonthlyCost" placeholder="0">
+              </div>
+              <span class="field-error" id="insuranceCostError"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="insurancePremiumEstimate">Monthly estimate of health insurance premium <span class="required">*</span></label>
+          <div class="input-with-prefix">
+            <span class="prefix">$</span>
+            <input type="text" inputmode="decimal" id="insurancePremiumEstimate" placeholder="50">
+          </div>
+          <span class="field-error" id="premiumEstimateError"></span>
+        </div>
+
+        <div class="form-group">
+          <label>J-2 Dependent monthly premium cost (spouse and child) <span class="required">*</span></label>
+          <div class="toggle-group" id="j2DependentToggle">
+            <button type="button" class="toggle-btn active-yes" data-value="offered">Offered</button>
+            <button type="button" class="toggle-btn" data-value="not-offered">Not offered</button>
+          </div>
+
+          <div class="conditional-field visible" id="j2CostField">
+            <div class="form-group">
+              <label for="j2DependentCost">Monthly premium per dependent <span class="required">*</span></label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="j2DependentCost" placeholder="200">
+              </div>
+              <span class="field-error" id="j2CostError"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <strong>Note:</strong> The type of coverage required by J-1 regulations is satisfied by the Cordell Hull Foundation group plan offered by Envisage Global Insurance which is approximately $50 per month per teacher or J-2 dependent. You can charge to a credit card and must obtain this insurance in advance – in order to receive your J-1 visa paperwork - before arriving in the U.S., if not immediately covered by the school plan. The link for teachers to inscribe and pay by credit card: <a href="https://www.envisageglobalinsurance.com/student-zone/Cordell-hull" target="_blank" rel="noopener">https://www.envisageglobalinsurance.com/student-zone/Cordell-hull</a><br><br>
+          The Code to input for the group rate is: <strong>CHF</strong><br><br>
+          CHF covers you and your family dependents ONLY for repatriation and medical evacuation. You are responsible to inscribe in and pay the required health insurance. Even if the school arranges it as part of your compensation, it is your responsibility to make sure that you and all family members are insured from the point of arrival until June 30 the following year and every year thereafter.
+        </div>
+      </section>
+
+      <!-- Step 3: Food Costs -->
+      <section class="wizard-step" data-step="3">
+        <h2>Food Costs</h2>
+        <p class="step-description">Estimate weekly food costs and provide individual item prices for reference.</p>
+
+        <div class="form-group">
+          <label for="weeklyEstimate">Estimated Cost per Teacher per Week <span class="required">*</span></label>
+          <div class="input-with-prefix">
+            <span class="prefix">$</span>
+            <input type="text" inputmode="decimal" id="weeklyEstimate" placeholder="110" required>
+          </div>
+          <span class="field-error" id="weeklyEstimateError"></span>
+        </div>
+
+        <h3 class="section-subheading">Individual Food Prices</h3>
+        <p class="field-hint">Search individual food costs on the Internet and provide approximate prices for common items in your area.</p>
+
+        <div class="cost-items-container" id="foodItemsContainer">
+          <!-- Food items rendered by JS -->
+        </div>
+
+        <div class="add-item-container">
+          <input type="text" id="newFoodLabel" placeholder="Add custom food item...">
+          <button type="button" id="addFoodBtn" class="btn-secondary">+ Add</button>
+        </div>
+      </section>
+
+      <!-- Step 4: Taxes & Fees -->
+      <section class="wizard-step" data-step="4">
+        <h2>Tax Deductions & Fees</h2>
+        <p class="step-description">Tax information for teachers whose salary is not paid by their home government.</p>
+
+        <h3 class="section-subheading">Tax Deductions</h3>
+
+        <div class="form-group">
+          <label for="federalTax">Federal: Percent of gross salary <span class="required">*</span></label>
+          <div class="input-with-suffix">
+            <input type="text" id="federalTax" placeholder="e.g., 12">
+            <span class="suffix">%</span>
+          </div>
+          <span class="field-error" id="federalTaxError"></span>
+        </div>
+
+        <div class="form-group">
+          <label>State: Percent of gross salary <span class="required">*</span></label>
+          <div class="toggle-group" id="stateTaxToggle">
+            <button type="button" class="toggle-btn active-yes" data-value="has-tax">Has state tax</button>
+            <button type="button" class="toggle-btn" data-value="no-tax">No state income tax</button>
+          </div>
+
+          <div class="conditional-field visible" id="stateTaxField">
+            <div class="form-group">
+              <label for="stateTax">State tax percentage <span class="required">*</span></label>
+              <div class="input-with-suffix">
+                <input type="text" id="stateTax" placeholder="e.g., 5">
+                <span class="suffix">%</span>
+              </div>
+              <span class="field-error" id="stateTaxError"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <strong>Social Security and Medicare:</strong> All J-1 visaholders are exempt for the first year and a half.
+        </div>
+
+        <h3 class="section-subheading">Other Fees</h3>
+
+        <div class="form-group">
+          <label>Education Evaluation <span class="required">*</span></label>
+          <div class="toggle-group" id="eduEvalToggle">
+            <button type="button" class="toggle-btn active-yes" data-value="needed">Needed</button>
+            <button type="button" class="toggle-btn" data-value="not-needed">Not needed</button>
+          </div>
+
+          <div class="conditional-field visible" id="eduEvalField">
+            <div class="form-group">
+              <label for="eduEvalAmount">Amount <span class="required">*</span></label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="eduEvalAmount" placeholder="200">
+              </div>
+              <span class="field-error" id="eduEvalError"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Union Fees <span class="required">*</span></label>
+          <div class="toggle-group" id="unionFeesToggle">
+            <button type="button" class="toggle-btn active-yes" data-value="has-fees">Has union fees</button>
+            <button type="button" class="toggle-btn" data-value="no-fees">No union fees</button>
+          </div>
+
+          <div class="conditional-field visible" id="unionFeesField">
+            <div class="form-group">
+              <label for="unionFeesAmount">Monthly amount <span class="required">*</span></label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="unionFeesAmount" placeholder="50">
+              </div>
+              <span class="field-error" id="unionFeesError"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 5: Housing -->
+      <section class="wizard-step" data-step="5">
+        <h2>Housing</h2>
+        <p class="step-description">Monthly housing costs that an exchange teacher can expect.</p>
+
+        <div class="form-group">
+          <label>Host family arrangement possible? <span class="required">*</span></label>
+          <div class="toggle-group" id="hostFamilyToggle">
+            <button type="button" class="toggle-btn" data-value="yes">Yes – possible to arrange</button>
+            <button type="button" class="toggle-btn" data-value="no">No – school does not provide</button>
+          </div>
+          <span class="field-error" id="hostFamilyError"></span>
+        </div>
+
+        <h3 class="section-subheading">Apartment Monthly Costs</h3>
+        <p class="field-hint">Provide approximate monthly rent for available apartment types in your area.</p>
+        <span class="field-error" id="apartmentError"></span>
+
+        <div class="cost-grid">
+          <div class="form-group">
+            <label for="studioInexpensive">Studio (inexpensive area) <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="studioInexpensive" placeholder="800">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="studioNearSchool">Studio (near school) <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="studioNearSchool" placeholder="1,000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="oneBedInexpensive">1-Bedroom (inexpensive area) <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="oneBedInexpensive" placeholder="1,000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="oneBedNearSchool">1-Bedroom (near school) <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="oneBedNearSchool" placeholder="1,200">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="twoBedInexpensive">2-Bedroom (inexpensive area) <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="twoBedInexpensive" placeholder="1,200">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="twoBedNearSchool">2-Bedroom (near school) <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="twoBedNearSchool" placeholder="1,500">
+            </div>
+          </div>
+        </div>
+
+        <h3 class="section-subheading">Monthly Utilities</h3>
+        <span class="field-error" id="utilityError"></span>
+
+        <div class="cost-grid">
+          <div class="form-group">
+            <label for="cellphone">Cellphone <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="cellphone" placeholder="40">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="internet">Internet <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="internet" placeholder="70">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="electricity">Electricity <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="electricity" placeholder="100">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 6: Transportation -->
+      <section class="wizard-step" data-step="6">
+        <h2>Transportation</h2>
+        <p class="step-description">Transportation costs in your area.</p>
+
+        <h3 class="section-subheading">Public Transportation</h3>
+        <span class="field-error" id="publicTransportError"></span>
+        <div class="cost-grid">
+          <div class="form-group">
+            <label for="singleRide">Single Ride <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="singleRide" placeholder="2.50">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="monthlyPass">Monthly Pass <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="monthlyPass" placeholder="60">
+            </div>
+          </div>
+        </div>
+
+        <h3 class="section-subheading">Automobile Costs</h3>
+        <span class="field-error" id="autoError"></span>
+        <div class="cost-grid">
+          <div class="form-group">
+            <label for="leaseCost">Lease Cost <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="leaseCost" placeholder="300">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="usedCarCost">Used Car Cost <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input type="text" inputmode="decimal" id="usedCarCost" placeholder="5,000">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newCarDeal">Special New Car Deal <span class="required">*</span></label>
+          <input type="text" id="newCarDeal" placeholder="e.g., 2024 Honda Civic - $22,000 with 0% APR">
+          <p class="field-hint">Describe any special deals available in your area.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="gasPerWeek">Gas per Week <span class="required">*</span></label>
+          <div class="input-with-prefix">
+            <span class="prefix">$</span>
+            <input type="text" inputmode="decimal" id="gasPerWeek" placeholder="40">
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 7: Entertainment -->
+      <section class="wizard-step" data-step="7">
+        <h2>Entertainment</h2>
+        <p class="step-description">Typical entertainment costs in your area.</p>
+
+        <div class="form-group">
+          <label for="movieTicket">Movie Theater Ticket <span class="required">*</span></label>
+          <div class="input-with-prefix">
+            <span class="prefix">$</span>
+            <input type="text" inputmode="decimal" id="movieTicket" placeholder="15">
+          </div>
+          <span class="field-error" id="movieTicketError"></span>
+        </div>
+
+        <h3 class="section-subheading">Sports Events</h3>
+        <p class="field-hint">Provide typical ticket costs or mark as N/A if not available in your area.</p>
+
+        <div class="form-group">
+          <label>Baseball <span class="required">*</span></label>
+          <div class="toggle-group" id="baseballToggle">
+            <button type="button" class="toggle-btn" data-value="available">Available</button>
+            <button type="button" class="toggle-btn" data-value="na">N/A</button>
+          </div>
+          <div class="conditional-field" id="baseballField">
+            <div class="form-group">
+              <label for="baseballCost">Typical ticket cost</label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="baseballCost" placeholder="30">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Football or Soccer <span class="required">*</span></label>
+          <div class="toggle-group" id="footballToggle">
+            <button type="button" class="toggle-btn" data-value="available">Available</button>
+            <button type="button" class="toggle-btn" data-value="na">N/A</button>
+          </div>
+          <div class="conditional-field" id="footballField">
+            <div class="form-group">
+              <label for="footballCost">Typical ticket cost</label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="footballCost" placeholder="50">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Basketball <span class="required">*</span></label>
+          <div class="toggle-group" id="basketballToggle">
+            <button type="button" class="toggle-btn" data-value="available">Available</button>
+            <button type="button" class="toggle-btn" data-value="na">N/A</button>
+          </div>
+          <div class="conditional-field" id="basketballField">
+            <div class="form-group">
+              <label for="basketballCost">Typical ticket cost</label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="basketballCost" placeholder="40">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Other Sport / Event <span class="required">*</span></label>
+          <div class="toggle-group" id="otherSportToggle">
+            <button type="button" class="toggle-btn" data-value="available">Available</button>
+            <button type="button" class="toggle-btn" data-value="na">N/A</button>
+          </div>
+          <div class="conditional-field" id="otherSportField">
+            <div class="form-group">
+              <label for="otherSportName">Description</label>
+              <input type="text" id="otherSportName" placeholder="e.g., NHL Hockey">
+            </div>
+            <div class="form-group">
+              <label for="otherSportCost">Typical ticket cost</label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="otherSportCost" placeholder="60">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 8: Review -->
+      <section class="wizard-step" data-step="8">
+        <h2>Review Your Estimate</h2>
+        <p class="step-description">Please review all costs before generating the PDF report.</p>
+
+        <div class="review-container" id="reviewContainer">
+          <!-- Review content rendered by JS -->
+        </div>
+
+        <div class="generate-section">
+          <button type="button" id="generatePdfBtn" class="btn-primary btn-large">
+            <span class="btn-icon">📄</span>
+            Generate PDF Report
+          </button>
+        </div>
+
+        <div class="progress-overlay" id="generatingOverlay" style="display: none;">
+          <div class="progress-modal">
+            <span class="spinner large"></span>
+            <p id="generatingStatus">Generating PDF...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Navigation Buttons -->
+    <footer class="wizard-navigation">
+      <button type="button" id="prevBtn" class="btn-secondary" style="visibility: hidden;">
+        ← Back
+      </button>
+      <button type="button" id="nextBtn" class="btn-primary">
+        Next →
+      </button>
+    </footer>
+
+    <div class="app-version" id="appVersion"></div>
+  </div>
+
+  <!-- Draft restore modal -->
+  <div class="progress-overlay" id="draftBanner" style="display: none;">
+    <div class="progress-modal draft-modal">
+      <p class="draft-modal-title">Resume your draft?</p>
+      <p class="draft-modal-text">You have an unsaved draft from <span id="draftDate"></span>.</p>
+      <div class="draft-modal-actions">
+        <button type="button" class="btn-primary" id="draftResumeBtn">Resume</button>
+        <button type="button" class="btn-secondary" id="draftDiscardBtn">Start fresh</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js?v=2.1.0"></script>
+</body>
+</html>
