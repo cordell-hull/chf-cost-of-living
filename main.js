@@ -86,6 +86,7 @@ let currentStep = 1;
 const TOTAL_STEPS = 8;
 
 const DRAFT_KEY = 'chf-cost-of-living';
+const SHARED_SCHOOL_KEY = 'chf-school-info';
 const AUTOSAVE_INTERVAL_MS = 30000;
 
 const DEFAULT_FOOD_LABELS = report.food.items.map(i => i.label);
@@ -123,6 +124,11 @@ function _buildDraftData() {
 
 function _saveCurrentDraft() {
   saveDraft(DRAFT_KEY, _buildDraftData());
+  try {
+    const existing = JSON.parse(localStorage.getItem(SHARED_SCHOOL_KEY) || '{}');
+    existing.schoolName = report.school.name || existing.schoolName || '';
+    localStorage.setItem(SHARED_SCHOOL_KEY, JSON.stringify(existing));
+  } catch {}
 }
 
 function _restoreDraft(draft) {
@@ -261,8 +267,21 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('appVersion').textContent = `v${APP_VERSION}`;
 
   initDraftRestore();
+  _loadSharedSchoolName();
   setInterval(_saveCurrentDraft, AUTOSAVE_INTERVAL_MS);
 });
+
+function _loadSharedSchoolName() {
+  if (report.school.name) return;
+  try {
+    const shared = JSON.parse(localStorage.getItem(SHARED_SCHOOL_KEY));
+    if (shared && shared.schoolName) {
+      report.school.name = shared.schoolName;
+      document.getElementById('schoolName').value = shared.schoolName;
+      updateHeaderDisplay();
+    }
+  } catch {}
+}
 
 function initCurrencyInputs() {
   document.querySelectorAll('.input-with-prefix input[type="text"][inputmode="decimal"]')
@@ -985,34 +1004,15 @@ function parseCurrency(raw) {
   const cleaned = raw.replace(/[^0-9.,]/g, '');
   if (!cleaned) return 0;
 
-  const lastComma = cleaned.lastIndexOf(',');
-  const lastDot = cleaned.lastIndexOf('.');
-
-  let normalized;
-  if (lastComma > lastDot) {
-    normalized = cleaned.replace(/\./g, '').replace(',', '.');
-  } else if (lastDot > lastComma) {
-    normalized = cleaned.replace(/,/g, '');
-  } else if (lastComma !== -1 && lastDot === -1) {
-    const afterComma = cleaned.slice(lastComma + 1);
-    if (afterComma.length === 3 && !cleaned.slice(0, lastComma).includes(',')) {
-      normalized = cleaned.replace(',', '');
-    } else {
-      normalized = cleaned.replace(/,/g, '.');
-    }
-  } else if (lastDot !== -1 && lastComma === -1) {
-    const afterDot = cleaned.slice(lastDot + 1);
-    if (afterDot.length === 3 && !cleaned.slice(0, lastDot).includes('.')) {
-      normalized = cleaned.replace('.', '');
-    } else {
-      normalized = cleaned;
-    }
-  } else {
-    normalized = cleaned;
+  // Rule: ends with separator + exactly 2 digits → decimal.
+  // Everything else: strip all separators (thousands/noise).
+  const decimalMatch = cleaned.match(/^(.+)[.,](\d{2})$/);
+  if (decimalMatch) {
+    const intPart = decimalMatch[1].replace(/[.,]/g, '');
+    return parseFloat(`${intPart}.${decimalMatch[2]}`) || 0;
   }
 
-  const result = parseFloat(normalized);
-  return isNaN(result) ? 0 : result;
+  return parseFloat(cleaned.replace(/[.,]/g, '')) || 0;
 }
 
 function formatCurrency(num) {
