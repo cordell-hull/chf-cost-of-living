@@ -86,6 +86,7 @@ let currentStep = 1;
 const TOTAL_STEPS = 8;
 
 const DRAFT_KEY = 'chf-cost-of-living';
+const SHARED_SCHOOL_KEY = 'chf-school-info';
 const AUTOSAVE_INTERVAL_MS = 30000;
 
 const DEFAULT_FOOD_LABELS = report.food.items.map(i => i.label);
@@ -123,6 +124,11 @@ function _buildDraftData() {
 
 function _saveCurrentDraft() {
   saveDraft(DRAFT_KEY, _buildDraftData());
+  try {
+    const existing = JSON.parse(localStorage.getItem(SHARED_SCHOOL_KEY) || '{}');
+    existing.schoolName = report.school.name || existing.schoolName || '';
+    localStorage.setItem(SHARED_SCHOOL_KEY, JSON.stringify(existing));
+  } catch {}
 }
 
 function _restoreDraft(draft) {
@@ -261,8 +267,21 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('appVersion').textContent = `v${APP_VERSION}`;
 
   initDraftRestore();
+  _loadSharedSchoolName();
   setInterval(_saveCurrentDraft, AUTOSAVE_INTERVAL_MS);
 });
+
+function _loadSharedSchoolName() {
+  if (report.school.name) return;
+  try {
+    const shared = JSON.parse(localStorage.getItem(SHARED_SCHOOL_KEY));
+    if (shared && shared.schoolName) {
+      report.school.name = shared.schoolName;
+      document.getElementById('schoolName').value = shared.schoolName;
+      updateHeaderDisplay();
+    }
+  } catch {}
+}
 
 function initCurrencyInputs() {
   document.querySelectorAll('.input-with-prefix input[type="text"][inputmode="decimal"]')
