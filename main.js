@@ -68,22 +68,27 @@ const report = {
     newCarDeal: '',
     gasPerWeek: 0
   },
+  visaFees: {
+    embassyVisa: null,
+    sevis: null,
+    integrityFee: null,
+    courierFee: null
+  },
   entertainment: {
+    broadway: 0,
+    broadwayNA: false,
     movieTicket: 0,
     baseball: 0,
     baseballNA: false,
-    football: 0,
-    footballNA: false,
     basketball: 0,
     basketballNA: false,
-    otherName: '',
-    otherCost: 0,
-    otherNA: false
+    hockey: 0,
+    hockeyNA: false
   }
 };
 
 let currentStep = 1;
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 const DRAFT_KEY = 'chf-cost-of-living';
 const SHARED_SCHOOL_KEY = 'chf-school-info';
@@ -116,6 +121,7 @@ function _buildDraftData() {
       items: report.food.items.map(i => ({ ...i }))
     },
     taxes: { ...report.taxes },
+    visaFees: { ...report.visaFees },
     housing: { ...report.housing },
     transportation: { ...report.transportation },
     entertainment: { ...report.entertainment }
@@ -141,6 +147,7 @@ function _restoreDraft(draft) {
     if (d.food.items) report.food.items = d.food.items;
   }
   Object.assign(report.taxes, d.taxes || {});
+  Object.assign(report.visaFees, d.visaFees || {});
   Object.assign(report.housing, d.housing || {});
   Object.assign(report.transportation, d.transportation || {});
   Object.assign(report.entertainment, d.entertainment || {});
@@ -176,7 +183,13 @@ function _restoreDraft(draft) {
   _setToggle('unionFeesToggle', report.taxes.noUnionFees ? 'no-fees' : 'has-fees');
   document.getElementById('unionFeesAmount').value = formatCurrency(report.taxes.unionFees);
 
-  // Restore Step 5
+  // Restore Step 5 (Visa Fees)
+  if (report.visaFees.embassyVisa) _setToggle('embassyVisaToggle', report.visaFees.embassyVisa);
+  if (report.visaFees.sevis) _setToggle('sevisToggle', report.visaFees.sevis);
+  if (report.visaFees.integrityFee) _setToggle('integrityFeeToggle', report.visaFees.integrityFee);
+  if (report.visaFees.courierFee) _setToggle('courierFeeToggle', report.visaFees.courierFee);
+
+  // Restore Step 6 (Housing)
   if (report.housing.hostFamily !== null) {
     _setToggle('hostFamilyToggle', report.housing.hostFamily ? 'yes' : 'no');
   }
@@ -198,17 +211,16 @@ function _restoreDraft(draft) {
   document.getElementById('newCarDeal').value = report.transportation.newCarDeal;
   document.getElementById('gasPerWeek').value = formatCurrency(report.transportation.gasPerWeek);
 
-  // Restore Step 7
+  // Restore Step 8 (Entertainment)
+  _setToggle('broadwayToggle', report.entertainment.broadwayNA ? 'na' : 'available');
+  document.getElementById('broadwayCost').value = formatCurrency(report.entertainment.broadway);
   document.getElementById('movieTicket').value = formatCurrency(report.entertainment.movieTicket);
   _setToggle('baseballToggle', report.entertainment.baseballNA ? 'na' : 'available');
   document.getElementById('baseballCost').value = formatCurrency(report.entertainment.baseball);
-  _setToggle('footballToggle', report.entertainment.footballNA ? 'na' : 'available');
-  document.getElementById('footballCost').value = formatCurrency(report.entertainment.football);
   _setToggle('basketballToggle', report.entertainment.basketballNA ? 'na' : 'available');
   document.getElementById('basketballCost').value = formatCurrency(report.entertainment.basketball);
-  _setToggle('otherSportToggle', report.entertainment.otherNA ? 'na' : 'available');
-  document.getElementById('otherSportName').value = report.entertainment.otherName;
-  document.getElementById('otherSportCost').value = formatCurrency(report.entertainment.otherCost);
+  _setToggle('hockeyToggle', report.entertainment.hockeyNA ? 'na' : 'available');
+  document.getElementById('hockeyCost').value = formatCurrency(report.entertainment.hockey);
 
   updateHeaderDisplay();
   currentStep = 1;
@@ -230,23 +242,45 @@ function _formatRelativeDate(isoString) {
   return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
 }
 
-function initDraftRestore() {
+function initLanding() {
   const draft = loadDraft(DRAFT_KEY);
-  if (!draft) return;
+  const landing = document.getElementById('landingScreen');
+  const continueBtn = document.getElementById('continueBtn');
+  const startNewBtn = document.getElementById('startNewBtn');
 
-  const banner = document.getElementById('draftBanner');
-  document.getElementById('draftDate').textContent = _formatRelativeDate(draft.savedAt);
-  banner.style.display = 'flex';
+  if (draft) {
+    document.getElementById('landingTitle').textContent = draft.data.school?.name || 'Cost of Living Estimate';
+    document.getElementById('landingInfo').textContent = `Draft saved ${_formatRelativeDate(draft.savedAt)}`;
+    continueBtn.style.display = '';
+    startNewBtn.textContent = 'Start Fresh';
+  } else {
+    document.getElementById('landingInfo').textContent = 'No saved draft found.';
+    continueBtn.style.display = 'none';
+  }
 
-  document.getElementById('draftResumeBtn').addEventListener('click', () => {
-    banner.style.display = 'none';
+  landing.style.display = 'flex';
+  document.getElementById('wizardProgress').style.display = 'none';
+  document.querySelector('.wizard-content').style.display = 'none';
+  document.getElementById('wizardNavigation').style.display = 'none';
+
+  continueBtn.addEventListener('click', () => {
     _restoreDraft(draft);
+    _showWizard();
   });
 
-  document.getElementById('draftDiscardBtn').addEventListener('click', () => {
-    banner.style.display = 'none';
+  startNewBtn.addEventListener('click', () => {
+    if (draft && !confirm('This will discard your saved draft. Continue?')) return;
     clearDraft(DRAFT_KEY);
+    _loadSharedSchoolName();
+    _showWizard();
   });
+}
+
+function _showWizard() {
+  document.getElementById('landingScreen').style.display = 'none';
+  document.getElementById('wizardProgress').style.display = '';
+  document.querySelector('.wizard-content').style.display = '';
+  document.getElementById('wizardNavigation').style.display = '';
 }
 
 async function _handlePdfImport(e) {
@@ -272,12 +306,13 @@ async function _handlePdfImport(e) {
       if (data.food.items) report.food.items = data.food.items;
     }
     Object.assign(report.taxes, data.taxes || {});
+    Object.assign(report.visaFees, data.visaFees || {});
     Object.assign(report.housing, data.housing || {});
     Object.assign(report.transportation, data.transportation || {});
     Object.assign(report.entertainment, data.entertainment || {});
 
-    document.getElementById('draftBanner').style.display = 'none';
     _restoreDraft({ data: report });
+    _showWizard();
     _saveCurrentDraft();
   } catch {
     errorEl.textContent = 'Failed to read PDF file.';
@@ -302,9 +337,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('appVersion').textContent = `v${APP_VERSION}`;
 
-  initDraftRestore();
-  _loadSharedSchoolName();
   document.getElementById('importPdfInput').addEventListener('change', _handlePdfImport);
+  initLanding();
   setInterval(_saveCurrentDraft, AUTOSAVE_INTERVAL_MS);
 });
 
@@ -375,7 +409,7 @@ function _activateToggle(group, activeBtn) {
   });
 
   const value = activeBtn.dataset.value;
-  const isPositive = ['yes', 'offered', 'has-tax', 'needed', 'has-fees', 'available'].includes(value);
+  const isPositive = ['yes', 'offered', 'has-tax', 'needed', 'has-fees', 'available', 'school'].includes(value);
   activeBtn.classList.add(isPositive ? 'active-yes' : 'active-no');
   group.classList.remove('toggle-error');
 }
@@ -404,10 +438,11 @@ function _updateConditionalFields() {
     ['stateTaxToggle', 'stateTaxField', 'has-tax'],
     ['eduEvalToggle', 'eduEvalField', 'needed'],
     ['unionFeesToggle', 'unionFeesField', 'has-fees'],
+    ['integrityFeeToggle', 'integrityFeeNote', 'teacher'],
+    ['broadwayToggle', 'broadwayField', 'available'],
     ['baseballToggle', 'baseballField', 'available'],
-    ['footballToggle', 'footballField', 'available'],
     ['basketballToggle', 'basketballField', 'available'],
-    ['otherSportToggle', 'otherSportField', 'available']
+    ['hockeyToggle', 'hockeyField', 'available']
   ];
 
   for (const [toggleId, fieldId, showValue] of mappings) {
@@ -521,7 +556,13 @@ function syncFormToState() {
   report.taxes.noUnionFees = _getToggleValue('unionFeesToggle') === 'no-fees';
   report.taxes.unionFees = parseCurrency(document.getElementById('unionFeesAmount').value);
 
-  // Step 5: Housing
+  // Step 5: Visa Fees
+  report.visaFees.embassyVisa = _getToggleValue('embassyVisaToggle');
+  report.visaFees.sevis = _getToggleValue('sevisToggle');
+  report.visaFees.integrityFee = _getToggleValue('integrityFeeToggle');
+  report.visaFees.courierFee = _getToggleValue('courierFeeToggle');
+
+  // Step 6: Housing
   const hostToggle = _getToggleValue('hostFamilyToggle');
   report.housing.hostFamily = hostToggle === 'yes' ? true : hostToggle === 'no' ? false : null;
   report.housing.studioInexpensive = parseCurrency(document.getElementById('studioInexpensive').value);
@@ -542,17 +583,16 @@ function syncFormToState() {
   report.transportation.newCarDeal = document.getElementById('newCarDeal').value.trim();
   report.transportation.gasPerWeek = parseCurrency(document.getElementById('gasPerWeek').value);
 
-  // Step 7: Entertainment
+  // Step 8: Entertainment
+  report.entertainment.broadwayNA = _getToggleValue('broadwayToggle') === 'na';
+  report.entertainment.broadway = parseCurrency(document.getElementById('broadwayCost').value);
   report.entertainment.movieTicket = parseCurrency(document.getElementById('movieTicket').value);
   report.entertainment.baseballNA = _getToggleValue('baseballToggle') === 'na';
   report.entertainment.baseball = parseCurrency(document.getElementById('baseballCost').value);
-  report.entertainment.footballNA = _getToggleValue('footballToggle') === 'na';
-  report.entertainment.football = parseCurrency(document.getElementById('footballCost').value);
   report.entertainment.basketballNA = _getToggleValue('basketballToggle') === 'na';
   report.entertainment.basketball = parseCurrency(document.getElementById('basketballCost').value);
-  report.entertainment.otherNA = _getToggleValue('otherSportToggle') === 'na';
-  report.entertainment.otherName = document.getElementById('otherSportName').value.trim();
-  report.entertainment.otherCost = parseCurrency(document.getElementById('otherSportCost').value);
+  report.entertainment.hockeyNA = _getToggleValue('hockeyToggle') === 'na';
+  report.entertainment.hockey = parseCurrency(document.getElementById('hockeyCost').value);
 }
 
 // ========================================
@@ -629,9 +669,10 @@ function validateCurrentStep() {
     case 2: return validateInsurance();
     case 3: return validateFood();
     case 4: return validateTaxes();
-    case 5: return validateHousing();
-    case 6: return validateTransport();
-    case 7: return validateEntertainment();
+    case 5: return validateVisaFees();
+    case 6: return validateHousing();
+    case 7: return validateTransport();
+    case 8: return validateEntertainment();
     default: return true;
   }
 }
@@ -718,6 +759,15 @@ function validateTaxes() {
   return valid;
 }
 
+function validateVisaFees() {
+  let valid = true;
+  if (!_requireToggle('embassyVisaToggle', 'embassyVisaError', 'Please select an option.')) valid = false;
+  if (!_requireToggle('sevisToggle', 'sevisError', 'Please select an option.')) valid = false;
+  if (!_requireToggle('integrityFeeToggle', 'integrityFeeError', 'Please select an option.')) valid = false;
+  if (!_requireToggle('courierFeeToggle', 'courierFeeError', 'Please select an option.')) valid = false;
+  return valid;
+}
+
 function validateHousing() {
   let valid = true;
   if (!_requireToggle('hostFamilyToggle', 'hostFamilyError', 'Please select Yes or No.')) valid = false;
@@ -791,14 +841,14 @@ function validateEntertainment() {
 
   if (!_requireCurrency('movieTicket', 'movieTicketError', 'Movie ticket cost is required.')) valid = false;
 
-  const sports = [
-    { toggle: 'baseballToggle', field: 'baseballCost', errorId: 'baseballToggle' },
-    { toggle: 'footballToggle', field: 'footballCost', errorId: 'footballToggle' },
-    { toggle: 'basketballToggle', field: 'basketballCost', errorId: 'basketballToggle' },
-    { toggle: 'otherSportToggle', field: 'otherSportCost', errorId: 'otherSportToggle' }
+  const events = [
+    { toggle: 'broadwayToggle', field: 'broadwayCost' },
+    { toggle: 'baseballToggle', field: 'baseballCost' },
+    { toggle: 'basketballToggle', field: 'basketballCost' },
+    { toggle: 'hockeyToggle', field: 'hockeyCost' }
   ];
 
-  for (const { toggle, field } of sports) {
+  for (const { toggle, field } of events) {
     const val = _getToggleValue(toggle);
     const group = document.getElementById(toggle);
     if (!val) {
@@ -813,7 +863,7 @@ function validateEntertainment() {
   }
 
   if (!valid && parseCurrency(document.getElementById('movieTicket').value) > 0) {
-    showError('movieTicketError', 'Select Available or N/A for each sport. Fill in cost if available.');
+    showError('movieTicketError', 'Select Available or N/A for each event. Fill in cost if available.');
   }
 
   return valid;
@@ -851,11 +901,15 @@ function renderReview() {
    .map(([label, v]) => `<div class="review-field"><span class="review-label">${label}</span><span class="review-value">$${formatCurrency(v)}/mo</span></div>`)
    .join('');
 
+  const _feeLabel = (val) => val === 'school'
+    ? '<span style="color:var(--color-success)">Reimbursed by school</span>'
+    : '<span style="color:var(--color-error)">Teacher responsible</span>';
+
   const sportsHtml = [
-    ['Baseball', e.baseball, e.baseballNA],
-    ['Football / Soccer', e.football, e.footballNA],
-    ['Basketball', e.basketball, e.basketballNA],
-    [e.otherName || 'Other', e.otherCost, e.otherNA]
+    ['Broadway Show', e.broadway, e.broadwayNA],
+    ['Professional Baseball', e.baseball, e.baseballNA],
+    ['Professional Basketball', e.basketball, e.basketballNA],
+    ['Professional Hockey', e.hockey, e.hockeyNA]
   ].map(([name, cost, isNA]) => {
     if (isNA) return `<div class="review-field"><span class="review-label">${escapeHtml(name)}</span><span class="review-value" style="color:var(--color-error)">N/A</span></div>`;
     if (cost) return `<div class="review-field"><span class="review-label">${escapeHtml(name)}</span><span class="review-value">$${formatCurrency(cost)}</span></div>`;
@@ -893,6 +947,14 @@ function renderReview() {
       ${r.taxes.noStateTax ? `<div class="review-field"><span class="review-label">State tax</span><span class="review-value" style="color:var(--color-error)">No state income tax</span></div>` : r.taxes.statePercent ? `<div class="review-field"><span class="review-label">State tax</span><span class="review-value">${escapeHtml(r.taxes.statePercent)}%</span></div>` : ''}
       ${!r.taxes.educationEvalNotNeeded && r.taxes.educationEvaluation ? `<div class="review-field"><span class="review-label">Education Evaluation</span><span class="review-value">$${formatCurrency(r.taxes.educationEvaluation)}</span></div>` : r.taxes.educationEvalNotNeeded ? `<div class="review-field"><span class="review-label">Education Evaluation</span><span class="review-value">Not needed</span></div>` : ''}
       ${!r.taxes.noUnionFees && r.taxes.unionFees ? `<div class="review-field"><span class="review-label">Union Fees</span><span class="review-value">$${formatCurrency(r.taxes.unionFees)}/mo</span></div>` : r.taxes.noUnionFees ? `<div class="review-field"><span class="review-label">Union Fees</span><span class="review-value">No union fees</span></div>` : ''}
+    </div>
+
+    <div class="review-section">
+      <h3>Visa & Sponsorship Fees</h3>
+      <div class="review-field"><span class="review-label">Embassy Visa fee ($185)</span><span class="review-value">${_feeLabel(r.visaFees.embassyVisa)}</span></div>
+      <div class="review-field"><span class="review-label">SEVIS fee ($220)</span><span class="review-value">${_feeLabel(r.visaFees.sevis)}</span></div>
+      <div class="review-field"><span class="review-label">Integrity fee ($500)</span><span class="review-value">${_feeLabel(r.visaFees.integrityFee)}</span></div>
+      <div class="review-field"><span class="review-label">Courier fee (~$30)</span><span class="review-value">${_feeLabel(r.visaFees.courierFee)}</span></div>
     </div>
 
     <div class="review-section">

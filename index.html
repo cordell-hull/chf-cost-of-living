@@ -22,7 +22,7 @@
     </header>
 
     <!-- Progress Indicator -->
-    <nav class="wizard-progress" aria-label="Form progress">
+    <nav class="wizard-progress" id="wizardProgress" aria-label="Form progress">
       <ol class="progress-steps">
         <li class="progress-step active" data-step="1">
           <span class="step-number">1</span>
@@ -42,18 +42,22 @@
         </li>
         <li class="progress-step" data-step="5">
           <span class="step-number">5</span>
-          <span class="step-label">Housing</span>
+          <span class="step-label">Visa</span>
         </li>
         <li class="progress-step" data-step="6">
           <span class="step-number">6</span>
-          <span class="step-label">Transport</span>
+          <span class="step-label">Housing</span>
         </li>
         <li class="progress-step" data-step="7">
           <span class="step-number">7</span>
-          <span class="step-label">Fun</span>
+          <span class="step-label">Transport</span>
         </li>
         <li class="progress-step" data-step="8">
           <span class="step-number">8</span>
+          <span class="step-label">Fun</span>
+        </li>
+        <li class="progress-step" data-step="9">
+          <span class="step-number">9</span>
           <span class="step-label">Review</span>
         </li>
       </ol>
@@ -281,8 +285,60 @@
         </div>
       </section>
 
-      <!-- Step 5: Housing -->
+      <!-- Step 5: Visa Fees -->
       <section class="wizard-step" data-step="5">
+        <h2>Visa & Sponsorship Fees</h2>
+        <p class="step-description">Fee information for J-1 exchange teachers.</p>
+
+        <div class="info-box">
+          <strong>CHF Sponsorship Fees:</strong> The school is required to pay the Cordell Hull Foundation sponsorship fees of $1,500 for the first year, $800 for the second and third year. The teacher must not pay these fees.
+        </div>
+
+        <h3 class="section-subheading">Fee Reimbursement</h3>
+        <p class="field-hint">Indicate who pays each fee.</p>
+
+        <div class="form-group">
+          <label>American Embassy Visa fee of $185 (for J-1 and each J-2 dependent) <span class="required">*</span></label>
+          <div class="toggle-group" id="embassyVisaToggle">
+            <button type="button" class="toggle-btn" data-value="school">Reimbursed by school</button>
+            <button type="button" class="toggle-btn" data-value="teacher">Teacher is responsible to pay</button>
+          </div>
+          <span class="field-error" id="embassyVisaError"></span>
+        </div>
+
+        <div class="form-group">
+          <label>SEVIS database fee of $220 <span class="required">*</span></label>
+          <div class="toggle-group" id="sevisToggle">
+            <button type="button" class="toggle-btn" data-value="school">Reimbursed by school</button>
+            <button type="button" class="toggle-btn" data-value="teacher">Teacher is responsible to pay</button>
+          </div>
+          <span class="field-error" id="sevisError"></span>
+        </div>
+
+        <div class="form-group">
+          <label>VISA "Integrity" fee of $500 <span class="required">*</span></label>
+          <div class="toggle-group" id="integrityFeeToggle">
+            <button type="button" class="toggle-btn" data-value="school">Reimbursed by school</button>
+            <button type="button" class="toggle-btn" data-value="teacher">Teacher is responsible to pay</button>
+          </div>
+          <div class="conditional-field" id="integrityFeeNote">
+            <p class="field-hint"><em>Teacher pays on your own credit card but the US govt. promises to reimburse you in the future after you leave the United States.</em></p>
+          </div>
+          <span class="field-error" id="integrityFeeError"></span>
+        </div>
+
+        <div class="form-group">
+          <label>American Embassy courier fee to return your passport (~$30) <span class="required">*</span></label>
+          <div class="toggle-group" id="courierFeeToggle">
+            <button type="button" class="toggle-btn" data-value="school">Reimbursed by school</button>
+            <button type="button" class="toggle-btn" data-value="teacher">Teacher is responsible to pay</button>
+          </div>
+          <span class="field-error" id="courierFeeError"></span>
+        </div>
+      </section>
+
+      <!-- Step 6: Housing -->
+      <section class="wizard-step" data-step="6">
         <h2>Housing</h2>
         <p class="step-description">Monthly housing costs that an exchange teacher can expect.</p>
 
@@ -372,8 +428,8 @@
         </div>
       </section>
 
-      <!-- Step 6: Transportation -->
-      <section class="wizard-step" data-step="6">
+      <!-- Step 7: Transportation -->
+      <section class="wizard-step" data-step="7">
         <h2>Transportation</h2>
         <p class="step-description">Transportation costs in your area.</p>
 
@@ -430,13 +486,30 @@
         </div>
       </section>
 
-      <!-- Step 7: Entertainment -->
-      <section class="wizard-step" data-step="7">
+      <!-- Step 8: Entertainment -->
+      <section class="wizard-step" data-step="8">
         <h2>Entertainment</h2>
         <p class="step-description">Typical entertainment costs in your area.</p>
 
         <div class="form-group">
-          <label for="movieTicket">Movie Theater Ticket <span class="required">*</span></label>
+          <label>Broadway Show <span class="required">*</span></label>
+          <div class="toggle-group" id="broadwayToggle">
+            <button type="button" class="toggle-btn" data-value="available">Available</button>
+            <button type="button" class="toggle-btn" data-value="na">Not in our area</button>
+          </div>
+          <div class="conditional-field" id="broadwayField">
+            <div class="form-group">
+              <label for="broadwayCost">Typical ticket cost</label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="broadwayCost" placeholder="100">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="movieTicket">Movie <span class="required">*</span></label>
           <div class="input-with-prefix">
             <span class="prefix">$</span>
             <input type="text" inputmode="decimal" id="movieTicket" placeholder="15">
@@ -444,14 +517,11 @@
           <span class="field-error" id="movieTicketError"></span>
         </div>
 
-        <h3 class="section-subheading">Sports Events</h3>
-        <p class="field-hint">Provide typical ticket costs or mark as N/A if not available in your area.</p>
-
         <div class="form-group">
-          <label>Baseball <span class="required">*</span></label>
+          <label>Professional Baseball Game <span class="required">*</span></label>
           <div class="toggle-group" id="baseballToggle">
             <button type="button" class="toggle-btn" data-value="available">Available</button>
-            <button type="button" class="toggle-btn" data-value="na">N/A</button>
+            <button type="button" class="toggle-btn" data-value="na">Not in our area</button>
           </div>
           <div class="conditional-field" id="baseballField">
             <div class="form-group">
@@ -465,27 +535,10 @@
         </div>
 
         <div class="form-group">
-          <label>Football or Soccer <span class="required">*</span></label>
-          <div class="toggle-group" id="footballToggle">
-            <button type="button" class="toggle-btn" data-value="available">Available</button>
-            <button type="button" class="toggle-btn" data-value="na">N/A</button>
-          </div>
-          <div class="conditional-field" id="footballField">
-            <div class="form-group">
-              <label for="footballCost">Typical ticket cost</label>
-              <div class="input-with-prefix">
-                <span class="prefix">$</span>
-                <input type="text" inputmode="decimal" id="footballCost" placeholder="50">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Basketball <span class="required">*</span></label>
+          <label>Professional Basketball Game <span class="required">*</span></label>
           <div class="toggle-group" id="basketballToggle">
             <button type="button" class="toggle-btn" data-value="available">Available</button>
-            <button type="button" class="toggle-btn" data-value="na">N/A</button>
+            <button type="button" class="toggle-btn" data-value="na">Not in our area</button>
           </div>
           <div class="conditional-field" id="basketballField">
             <div class="form-group">
@@ -499,29 +552,25 @@
         </div>
 
         <div class="form-group">
-          <label>Other Sport / Event <span class="required">*</span></label>
-          <div class="toggle-group" id="otherSportToggle">
+          <label>Professional Hockey Game <span class="required">*</span></label>
+          <div class="toggle-group" id="hockeyToggle">
             <button type="button" class="toggle-btn" data-value="available">Available</button>
-            <button type="button" class="toggle-btn" data-value="na">N/A</button>
+            <button type="button" class="toggle-btn" data-value="na">Not in our area</button>
           </div>
-          <div class="conditional-field" id="otherSportField">
+          <div class="conditional-field" id="hockeyField">
             <div class="form-group">
-              <label for="otherSportName">Description</label>
-              <input type="text" id="otherSportName" placeholder="e.g., NHL Hockey">
-            </div>
-            <div class="form-group">
-              <label for="otherSportCost">Typical ticket cost</label>
+              <label for="hockeyCost">Typical ticket cost</label>
               <div class="input-with-prefix">
                 <span class="prefix">$</span>
-                <input type="text" inputmode="decimal" id="otherSportCost" placeholder="60">
+                <input type="text" inputmode="decimal" id="hockeyCost" placeholder="50">
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Step 8: Review -->
-      <section class="wizard-step" data-step="8">
+      <!-- Step 9: Review -->
+      <section class="wizard-step" data-step="9">
         <h2>Review Your Estimate</h2>
         <p class="step-description">Please review all costs before generating the PDF report.</p>
 
@@ -546,7 +595,7 @@
     </main>
 
     <!-- Navigation Buttons -->
-    <footer class="wizard-navigation">
+    <footer class="wizard-navigation" id="wizardNavigation">
       <button type="button" id="prevBtn" class="btn-secondary" style="visibility: hidden;">
         ← Back
       </button>
@@ -558,24 +607,19 @@
     <div class="app-version" id="appVersion"></div>
   </div>
 
-  <!-- Import from PDF -->
-  <div class="import-section">
-    <label class="btn-secondary btn-import" for="importPdfInput">
-      Import from PDF
-    </label>
-    <input type="file" id="importPdfInput" accept=".pdf" style="display: none;">
-    <span class="field-error" id="importError"></span>
-    <p class="field-hint">Load data from a previously generated Cost of Living PDF.</p>
-  </div>
-
-  <!-- Draft restore modal -->
-  <div class="progress-overlay" id="draftBanner" style="display: none;">
+  <!-- Landing Screen -->
+  <div class="progress-overlay" id="landingScreen" style="display: none;">
     <div class="progress-modal draft-modal">
-      <p class="draft-modal-title">Resume your draft?</p>
-      <p class="draft-modal-text">You have an unsaved draft from <span id="draftDate"></span>.</p>
-      <div class="draft-modal-actions">
-        <button type="button" class="btn-primary" id="draftResumeBtn">Resume</button>
-        <button type="button" class="btn-secondary" id="draftDiscardBtn">Start fresh</button>
+      <p class="draft-modal-title" id="landingTitle">Cost of Living Estimate</p>
+      <p class="draft-modal-text" id="landingInfo"></p>
+      <div class="draft-modal-actions" style="flex-direction: column; align-items: stretch;">
+        <button type="button" class="btn-primary" id="continueBtn" style="display: none;">Continue Editing</button>
+        <button type="button" class="btn-secondary" id="startNewBtn">Start New Estimate</button>
+        <label class="btn-secondary btn-import" for="importPdfInput" style="text-align: center;">
+          Import from PDF
+        </label>
+        <input type="file" id="importPdfInput" accept=".pdf" style="display: none;">
+        <span class="field-error" id="importError" style="text-align: center;"></span>
       </div>
     </div>
   </div>
