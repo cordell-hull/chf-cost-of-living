@@ -165,7 +165,8 @@ function _restoreDraft(draft) {
   if (report.healthInsurance.schoolOffers !== null) {
     _setToggle('schoolOffersInsurance', report.healthInsurance.schoolOffers ? 'yes' : 'no');
   }
-  document.getElementById('insuranceMonthlyCost').value = formatCurrency(report.healthInsurance.monthlyCostToTeacher);
+  const insCost = report.healthInsurance.monthlyCostToTeacher;
+  document.getElementById('insuranceMonthlyCost').value = insCost === 0 ? '0' : formatCurrency(insCost);
   document.getElementById('insurancePremiumEstimate').value = formatCurrency(report.healthInsurance.monthlyPremiumEstimate);
   _setToggle('j2DependentToggle', report.healthInsurance.j2Offered ? 'offered' : 'not-offered');
   document.getElementById('j2DependentCost').value = formatCurrency(report.healthInsurance.j2DependentCost);
@@ -281,6 +282,7 @@ function _showWizard() {
   document.getElementById('wizardProgress').style.display = '';
   document.querySelector('.wizard-content').style.display = '';
   document.getElementById('wizardNavigation').style.display = '';
+  setInterval(_saveCurrentDraft, AUTOSAVE_INTERVAL_MS);
 }
 
 async function _handlePdfImport(e) {
@@ -339,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('importPdfInput').addEventListener('change', _handlePdfImport);
   initLanding();
-  setInterval(_saveCurrentDraft, AUTOSAVE_INTERVAL_MS);
 });
 
 function _loadSharedSchoolName() {
@@ -721,7 +722,7 @@ function validateInsurance() {
   if (!_requireToggle('schoolOffersInsurance', 'insuranceToggleError', 'Please select Yes or No.')) {
     valid = false;
   } else if (report.healthInsurance.schoolOffers) {
-    if (!_requireCurrency('insuranceMonthlyCost', 'insuranceCostError', 'Monthly cost is required.')) valid = false;
+    if (!_requireText('insuranceMonthlyCost', 'insuranceCostError', 'Monthly cost is required.')) valid = false;
   }
 
   if (!_requireCurrency('insurancePremiumEstimate', 'premiumEstimateError', 'Premium estimate is required.')) valid = false;
@@ -862,8 +863,10 @@ function validateEntertainment() {
     }
   }
 
-  if (!valid && parseCurrency(document.getElementById('movieTicket').value) > 0) {
-    showError('movieTicketError', 'Select Available or N/A for each event. Fill in cost if available.');
+  if (valid) {
+    clearError('eventsError');
+  } else if (parseCurrency(document.getElementById('movieTicket').value) > 0) {
+    showError('eventsError', 'Select Available or N/A for each event. Fill in cost if available.');
   }
 
   return valid;
