@@ -912,6 +912,26 @@ textarea {
   box-shadow: none;
 }
 
+/* Import Section */
+.import-section {
+  text-align: center;
+  padding: var(--spacing-md) 0;
+}
+
+.btn-import {
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.import-section .field-hint {
+  margin-top: var(--spacing-sm);
+}
+
+.import-section .field-error {
+  display: block;
+  margin-top: var(--spacing-sm);
+}
+
 /* App Version Footer */
 .app-version {
   text-align: center;

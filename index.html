@@ -558,6 +558,16 @@
     <div class="app-version" id="appVersion"></div>
   </div>
 
+  <!-- Import from PDF -->
+  <div class="import-section">
+    <label class="btn-secondary btn-import" for="importPdfInput">
+      Import from PDF
+    </label>
+    <input type="file" id="importPdfInput" accept=".pdf" style="display: none;">
+    <span class="field-error" id="importError"></span>
+    <p class="field-hint">Load data from a previously generated Cost of Living PDF.</p>
+  </div>
+
   <!-- Draft restore modal -->
   <div class="progress-overlay" id="draftBanner" style="display: none;">
     <div class="progress-modal draft-modal">
