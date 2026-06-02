@@ -1108,7 +1108,7 @@ function parseCurrency(raw) {
 
   // Rule: ends with separator + exactly 2 digits → decimal.
   // Everything else: strip all separators (thousands/noise).
-  const decimalMatch = cleaned.match(/^(.+)[.,](\d{2})$/);
+  const decimalMatch = cleaned.match(/^(.+)[.,](\d{1,2})$/);
   if (decimalMatch) {
     const intPart = decimalMatch[1].replace(/[.,]/g, '');
     return parseFloat(`${intPart}.${decimalMatch[2]}`) || 0;
