@@ -75,15 +75,15 @@ const report = {
     courierFee: null
   },
   entertainment: {
+    broadwayStatus: null,
     broadway: 0,
-    broadwayNA: false,
     movieTicket: 0,
+    baseballStatus: null,
     baseball: 0,
-    baseballNA: false,
+    basketballStatus: null,
     basketball: 0,
-    basketballNA: false,
-    hockey: 0,
-    hockeyNA: false
+    hockeyStatus: null,
+    hockey: 0
   }
 };
 
@@ -213,15 +213,17 @@ function _restoreDraft(draft) {
   document.getElementById('gasPerWeek').value = formatCurrency(report.transportation.gasPerWeek);
 
   // Restore Step 8 (Entertainment)
-  _setToggle('broadwayToggle', report.entertainment.broadwayNA ? 'na' : 'available');
+  if (report.entertainment.broadwayStatus) _setToggle('broadwayToggle', report.entertainment.broadwayStatus);
   document.getElementById('broadwayCost').value = formatCurrency(report.entertainment.broadway);
   document.getElementById('movieTicket').value = formatCurrency(report.entertainment.movieTicket);
-  _setToggle('baseballToggle', report.entertainment.baseballNA ? 'na' : 'available');
+  if (report.entertainment.baseballStatus) _setToggle('baseballToggle', report.entertainment.baseballStatus);
   document.getElementById('baseballCost').value = formatCurrency(report.entertainment.baseball);
-  _setToggle('basketballToggle', report.entertainment.basketballNA ? 'na' : 'available');
+  if (report.entertainment.basketballStatus) _setToggle('basketballToggle', report.entertainment.basketballStatus);
   document.getElementById('basketballCost').value = formatCurrency(report.entertainment.basketball);
-  _setToggle('hockeyToggle', report.entertainment.hockeyNA ? 'na' : 'available');
+  if (report.entertainment.hockeyStatus) _setToggle('hockeyToggle', report.entertainment.hockeyStatus);
   document.getElementById('hockeyCost').value = formatCurrency(report.entertainment.hockey);
+
+  _updateNoStateTaxLabel();
 
   updateHeaderDisplay();
   currentStep = 1;
@@ -375,6 +377,14 @@ function initSchoolNameListener() {
     report.school.name = input.value.trim();
     updateHeaderDisplay();
   });
+
+  document.getElementById('state').addEventListener('change', _updateNoStateTaxLabel);
+}
+
+function _updateNoStateTaxLabel() {
+  const state = document.getElementById('state').value;
+  const btn = document.getElementById('noStateTaxBtn');
+  btn.textContent = state ? `No state tax in ${state}` : 'No state income tax';
 }
 
 // ========================================
@@ -410,7 +420,7 @@ function _activateToggle(group, activeBtn) {
   });
 
   const value = activeBtn.dataset.value;
-  const isPositive = ['yes', 'offered', 'has-tax', 'needed', 'has-fees', 'available', 'school'].includes(value);
+  const isPositive = ['yes', 'offered', 'has-tax', 'needed', 'has-fees', 'available', 'local', 'school'].includes(value);
   activeBtn.classList.add(isPositive ? 'active-yes' : 'active-no');
   group.classList.remove('toggle-error');
 }
@@ -440,17 +450,18 @@ function _updateConditionalFields() {
     ['eduEvalToggle', 'eduEvalField', 'needed'],
     ['unionFeesToggle', 'unionFeesField', 'has-fees'],
     ['integrityFeeToggle', 'integrityFeeNote', 'teacher'],
-    ['broadwayToggle', 'broadwayField', 'available'],
-    ['baseballToggle', 'baseballField', 'available'],
-    ['basketballToggle', 'basketballField', 'available'],
-    ['hockeyToggle', 'hockeyField', 'available']
+    ['broadwayToggle', 'broadwayField', ['available', 'local']],
+    ['baseballToggle', 'baseballField', ['available', 'local']],
+    ['basketballToggle', 'basketballField', ['available', 'local']],
+    ['hockeyToggle', 'hockeyField', ['available', 'local']]
   ];
 
   for (const [toggleId, fieldId, showValue] of mappings) {
     const val = _getToggleValue(toggleId);
     const field = document.getElementById(fieldId);
     if (field) {
-      field.classList.toggle('visible', val === showValue);
+      const show = Array.isArray(showValue) ? showValue.includes(val) : val === showValue;
+      field.classList.toggle('visible', show);
     }
   }
 }
@@ -585,14 +596,14 @@ function syncFormToState() {
   report.transportation.gasPerWeek = parseCurrency(document.getElementById('gasPerWeek').value);
 
   // Step 8: Entertainment
-  report.entertainment.broadwayNA = _getToggleValue('broadwayToggle') === 'na';
+  report.entertainment.broadwayStatus = _getToggleValue('broadwayToggle');
   report.entertainment.broadway = parseCurrency(document.getElementById('broadwayCost').value);
   report.entertainment.movieTicket = parseCurrency(document.getElementById('movieTicket').value);
-  report.entertainment.baseballNA = _getToggleValue('baseballToggle') === 'na';
+  report.entertainment.baseballStatus = _getToggleValue('baseballToggle');
   report.entertainment.baseball = parseCurrency(document.getElementById('baseballCost').value);
-  report.entertainment.basketballNA = _getToggleValue('basketballToggle') === 'na';
+  report.entertainment.basketballStatus = _getToggleValue('basketballToggle');
   report.entertainment.basketball = parseCurrency(document.getElementById('basketballCost').value);
-  report.entertainment.hockeyNA = _getToggleValue('hockeyToggle') === 'na';
+  report.entertainment.hockeyStatus = _getToggleValue('hockeyToggle');
   report.entertainment.hockey = parseCurrency(document.getElementById('hockeyCost').value);
 }
 
@@ -742,12 +753,21 @@ function validateFood() {
   return true;
 }
 
+function _requirePercent(fieldId, errorId, msg) {
+  const raw = document.getElementById(fieldId).value.trim();
+  if (!raw) { showError(errorId, msg); return false; }
+  const num = parseFloat(raw.replace(/[^0-9.]/g, ''));
+  if (isNaN(num) || num <= 0) { showError(errorId, 'Please enter a valid percentage (numbers only).'); return false; }
+  clearError(errorId);
+  return true;
+}
+
 function validateTaxes() {
   let valid = true;
-  if (!_requireText('federalTax', 'federalTaxError', 'Federal tax % is required.')) valid = false;
+  if (!_requirePercent('federalTax', 'federalTaxError', 'Federal tax % is required.')) valid = false;
 
   if (!report.taxes.noStateTax) {
-    if (!_requireText('stateTax', 'stateTaxError', 'State tax % is required.')) valid = false;
+    if (!_requirePercent('stateTax', 'stateTaxError', 'State tax % is required.')) valid = false;
   }
 
   if (!report.taxes.educationEvalNotNeeded) {
@@ -857,7 +877,7 @@ function validateEntertainment() {
       valid = false;
     } else {
       if (group) group.classList.remove('toggle-error');
-      if (val === 'available' && parseCurrency(document.getElementById(field).value) <= 0) {
+      if ((val === 'available' || val === 'local') && parseCurrency(document.getElementById(field).value) <= 0) {
         valid = false;
       }
     }
@@ -908,13 +928,20 @@ function renderReview() {
     ? '<span style="color:var(--color-success)">Reimbursed by school</span>'
     : '<span style="color:var(--color-error)">Teacher responsible</span>';
 
+  const _eventLabel = (status) => {
+    if (status === 'na') return 'Not available in our area';
+    if (status === 'local') return 'Local games only';
+    return null;
+  };
+
   const sportsHtml = [
-    ['Broadway Show', e.broadway, e.broadwayNA],
-    ['Professional Baseball', e.baseball, e.baseballNA],
-    ['Professional Basketball', e.basketball, e.basketballNA],
-    ['Professional Hockey', e.hockey, e.hockeyNA]
-  ].map(([name, cost, isNA]) => {
-    if (isNA) return `<div class="review-field"><span class="review-label">${escapeHtml(name)}</span><span class="review-value" style="color:var(--color-error)">N/A</span></div>`;
+    ['Broadway Show', e.broadway, e.broadwayStatus],
+    ['Professional Baseball', e.baseball, e.baseballStatus],
+    ['Professional Basketball', e.basketball, e.basketballStatus],
+    ['Professional Hockey', e.hockey, e.hockeyStatus]
+  ].map(([name, cost, status]) => {
+    const alt = _eventLabel(status);
+    if (alt) return `<div class="review-field"><span class="review-label">${escapeHtml(name)}</span><span class="review-value" style="color:var(--color-error)">${alt}</span></div>`;
     if (cost) return `<div class="review-field"><span class="review-label">${escapeHtml(name)}</span><span class="review-value">$${formatCurrency(cost)}</span></div>`;
     return '';
   }).filter(Boolean).join('');
@@ -947,7 +974,7 @@ function renderReview() {
     <div class="review-section">
       <h3>Tax Deductions & Fees</h3>
       ${r.taxes.federalPercent ? `<div class="review-field"><span class="review-label">Federal tax</span><span class="review-value">${escapeHtml(r.taxes.federalPercent)}%</span></div>` : ''}
-      ${r.taxes.noStateTax ? `<div class="review-field"><span class="review-label">State tax</span><span class="review-value" style="color:var(--color-error)">No state income tax</span></div>` : r.taxes.statePercent ? `<div class="review-field"><span class="review-label">State tax</span><span class="review-value">${escapeHtml(r.taxes.statePercent)}%</span></div>` : ''}
+      ${r.taxes.noStateTax ? `<div class="review-field"><span class="review-label">State tax</span><span class="review-value">No state tax in ${escapeHtml(r.school.state)}</span></div>` : r.taxes.statePercent ? `<div class="review-field"><span class="review-label">State tax</span><span class="review-value">${escapeHtml(r.taxes.statePercent)}%</span></div>` : ''}
       ${!r.taxes.educationEvalNotNeeded && r.taxes.educationEvaluation ? `<div class="review-field"><span class="review-label">Education Evaluation</span><span class="review-value">$${formatCurrency(r.taxes.educationEvaluation)}</span></div>` : r.taxes.educationEvalNotNeeded ? `<div class="review-field"><span class="review-label">Education Evaluation</span><span class="review-value">Not needed</span></div>` : ''}
       ${!r.taxes.noUnionFees && r.taxes.unionFees ? `<div class="review-field"><span class="review-label">Union Fees</span><span class="review-value">$${formatCurrency(r.taxes.unionFees)}/mo</span></div>` : r.taxes.noUnionFees ? `<div class="review-field"><span class="review-label">Union Fees</span><span class="review-value">No union fees</span></div>` : ''}
     </div>

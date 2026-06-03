@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cost of Living Estimate - Cordell Hull Foundation</title>
   <link rel="icon" type="image/jpeg" href="./assets/logo.jpeg">
-  <link rel="stylesheet" href="styles.css?v=2.2.0">
+  <link rel="stylesheet" href="styles.css?v=2.3.0">
 </head>
 <body>
   <div class="app-container">
@@ -225,7 +225,7 @@
           <label>State: Percent of gross salary <span class="required">*</span></label>
           <div class="toggle-group" id="stateTaxToggle">
             <button type="button" class="toggle-btn active-yes" data-value="has-tax">Has state tax</button>
-            <button type="button" class="toggle-btn" data-value="no-tax">No state income tax</button>
+            <button type="button" class="toggle-btn" data-value="no-tax" id="noStateTaxBtn">No state income tax</button>
           </div>
 
           <div class="conditional-field visible" id="stateTaxField">
@@ -497,7 +497,8 @@
           <label>Broadway Show <span class="required">*</span></label>
           <div class="toggle-group" id="broadwayToggle">
             <button type="button" class="toggle-btn" data-value="available">Available</button>
-            <button type="button" class="toggle-btn" data-value="na">Not in our area</button>
+            <button type="button" class="toggle-btn" data-value="na">Not available in our area</button>
+            <button type="button" class="toggle-btn" data-value="local">Local shows only</button>
           </div>
           <div class="conditional-field" id="broadwayField">
             <div class="form-group">
@@ -523,7 +524,8 @@
           <label>Professional Baseball Game <span class="required">*</span></label>
           <div class="toggle-group" id="baseballToggle">
             <button type="button" class="toggle-btn" data-value="available">Available</button>
-            <button type="button" class="toggle-btn" data-value="na">Not in our area</button>
+            <button type="button" class="toggle-btn" data-value="na">Not available in our area</button>
+            <button type="button" class="toggle-btn" data-value="local">Local games only</button>
           </div>
           <div class="conditional-field" id="baseballField">
             <div class="form-group">
@@ -540,7 +542,8 @@
           <label>Professional Basketball Game <span class="required">*</span></label>
           <div class="toggle-group" id="basketballToggle">
             <button type="button" class="toggle-btn" data-value="available">Available</button>
-            <button type="button" class="toggle-btn" data-value="na">Not in our area</button>
+            <button type="button" class="toggle-btn" data-value="na">Not available in our area</button>
+            <button type="button" class="toggle-btn" data-value="local">Local games only</button>
           </div>
           <div class="conditional-field" id="basketballField">
             <div class="form-group">
@@ -557,7 +560,8 @@
           <label>Professional Hockey Game <span class="required">*</span></label>
           <div class="toggle-group" id="hockeyToggle">
             <button type="button" class="toggle-btn" data-value="available">Available</button>
-            <button type="button" class="toggle-btn" data-value="na">Not in our area</button>
+            <button type="button" class="toggle-btn" data-value="na">Not available in our area</button>
+            <button type="button" class="toggle-btn" data-value="local">Local games only</button>
           </div>
           <div class="conditional-field" id="hockeyField">
             <div class="form-group">
@@ -626,6 +630,6 @@
     </div>
   </div>
 
-  <script type="module" src="main.js?v=2.2.0"></script>
+  <script type="module" src="main.js?v=2.3.0"></script>
 </body>
 </html>
