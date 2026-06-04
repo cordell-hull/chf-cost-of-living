@@ -898,15 +898,25 @@ function validateEntertainment() {
     } else {
       if (group) group.classList.remove('toggle-error');
       if ((val === 'available' || val === 'local') && parseCurrency(document.getElementById(field).value) <= 0) {
+        document.getElementById(field).classList.add('invalid');
         valid = false;
+      } else {
+        document.getElementById(field).classList.remove('invalid');
       }
     }
   }
 
   if (valid) {
     clearError('eventsError');
-  } else if (parseCurrency(document.getElementById('movieTicket').value) > 0) {
-    showError('eventsError', 'Select Available or N/A for each event. Fill in cost if available.');
+  } else {
+    const msgs = [];
+    if (parseCurrency(document.getElementById('movieTicket').value) <= 0) msgs.push('movie ticket cost');
+    for (const { toggle, field } of events) {
+      const val = _getToggleValue(toggle);
+      if (!val) msgs.push('a selection for each event');
+      else if ((val === 'available' || val === 'local') && parseCurrency(document.getElementById(field).value) <= 0) msgs.push('ticket cost for available events');
+    }
+    showError('eventsError', msgs.length ? `Please fill in: ${[...new Set(msgs)].join(', ')}.` : '');
   }
 
   return valid;
