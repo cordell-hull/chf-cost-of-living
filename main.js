@@ -338,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initToggleGroups();
   initSchoolNameListener();
   initCurrencyInputs();
+  initPhoneFormatting();
   document.getElementById('generatePdfBtn').addEventListener('click', generateReport);
 
   renderFoodItems();
@@ -363,6 +364,15 @@ function _loadSharedSchoolName() {
 function initCurrencyInputs() {
   document.querySelectorAll('.input-with-prefix input[type="text"][inputmode="decimal"]')
     .forEach(input => input.addEventListener('blur', _onCurrencyBlur));
+}
+
+function initPhoneFormatting() {
+  document.getElementById('contactPhone').addEventListener('blur', (e) => {
+    const digits = e.target.value.replace(/\D/g, '');
+    if (digits.length === 10) {
+      e.target.value = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+    }
+  });
 }
 
 // ========================================
