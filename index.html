@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cost of Living Estimate - Cordell Hull Foundation</title>
   <link rel="icon" type="image/jpeg" href="./assets/logo.jpeg">
-  <link rel="stylesheet" href="styles.css?v=2.5.0">
+  <link rel="stylesheet" href="styles.css?v=2.6.0">
 </head>
 <body>
   <div class="app-container">
@@ -326,13 +326,13 @@
         </div>
 
         <div class="form-group">
-          <label>VISA "Integrity" fee of $500 <span class="required">*</span></label>
+          <label>Visa Integrity Fee of $250 <span class="required">*</span></label>
           <div class="toggle-group" id="integrityFeeToggle">
             <button type="button" class="toggle-btn" data-value="school">Reimbursed by school</button>
             <button type="button" class="toggle-btn" data-value="teacher">Teacher is responsible to pay</button>
           </div>
           <div class="conditional-field" id="integrityFeeNote">
-            <p class="field-hint"><em>Teacher pays on your own credit card but the US govt. promises to reimburse you in the future after you leave the United States.</em></p>
+            <p class="field-hint"><em>Charged to your credit card after you receive J-1 visa approval. Will be reimbursed on your credit card after you leave the US at the end of the J-1 visa term.</em></p>
           </div>
           <span class="field-error" id="integrityFeeError"></span>
         </div>
@@ -594,6 +594,10 @@
           <!-- Review content rendered by JS -->
         </div>
 
+        <div class="info-box" style="margin-top: var(--spacing-lg);">
+          For further information, all costs associated with the J-1 visa are listed on the Cordell Hull Foundation website: <a href="https://www.cordell-hull.org/teacher-costs-associated-with-the-j-1-teacher-visa/" target="_blank" rel="noopener">www.cordell-hull.org/teacher-costs-associated-with-the-j-1-teacher-visa</a>
+        </div>
+
         <div class="generate-section">
           <button type="button" id="generatePdfBtn" class="btn-primary btn-large">
             <span class="btn-icon">📄</span>
@@ -640,6 +644,6 @@
     </div>
   </div>
 
-  <script type="module" src="main.js?v=2.5.0"></script>
+  <script type="module" src="main.js?v=2.6.0"></script>
 </body>
 </html>

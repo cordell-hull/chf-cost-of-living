@@ -1013,7 +1013,7 @@ function renderReview() {
       <h3>Visa & Sponsorship Fees</h3>
       <div class="review-field"><span class="review-label">Embassy Visa fee ($185)</span><span class="review-value">${_feeLabel(r.visaFees.embassyVisa)}</span></div>
       <div class="review-field"><span class="review-label">SEVIS fee ($220)</span><span class="review-value">${_feeLabel(r.visaFees.sevis)}</span></div>
-      <div class="review-field"><span class="review-label">Integrity fee ($500)</span><span class="review-value">${_feeLabel(r.visaFees.integrityFee)}</span></div>
+      <div class="review-field"><span class="review-label">Visa Integrity Fee ($250)</span><span class="review-value">${_feeLabel(r.visaFees.integrityFee)}</span></div>
       <div class="review-field"><span class="review-label">Courier fee (~$30)</span><span class="review-value">${_feeLabel(r.visaFees.courierFee)}</span></div>
     </div>
 
