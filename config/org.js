@@ -22,15 +22,13 @@ export const ORG_CONFIG = {
   ],
 
   // Contact information
-  phone: '(202) 555-0100',
-  email: 'info@cordellhullfoundation.org',
   website: 'www.cordell-hull.org',
 
   // PDF Document settings
   pdf: {
-    title: 'Cost of Living Estimate',
+    title: 'Cultural Activities Annual Report (J-1 Teacher)',
     author: 'Cordell Hull Foundation',
-    subject: 'J-1 Teacher Exchange Program Cost of Living Estimate',
+    subject: 'J-1 Teacher Cultural Exchange Program Annual Report',
 
     // Colors (RGB 0-1 scale for pdf-lib)
     colors: {

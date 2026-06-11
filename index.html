@@ -436,6 +436,44 @@
             </div>
           </div>
         </div>
+
+        <h3 class="section-subheading">Relocation & Apartment Search</h3>
+
+        <div class="form-group">
+          <label>Did you hire a relocation company? <span class="required">*</span></label>
+          <div class="toggle-group" id="relocationToggle">
+            <button type="button" class="toggle-btn" data-value="yes">Yes</button>
+            <button type="button" class="toggle-btn" data-value="no">No</button>
+          </div>
+          <span class="field-error" id="relocationError"></span>
+          <div class="conditional-field" id="relocationDetailsField">
+            <div class="form-group">
+              <label for="relocationCompany">Name of Company</label>
+              <input type="text" id="relocationCompany" placeholder="Company name">
+            </div>
+            <div class="form-group">
+              <label for="relocationEmail">Contact Email</label>
+              <input type="text" id="relocationEmail" placeholder="company@example.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Recommended services to look for apartments in your area</label>
+          <p class="field-hint">Choose any that apply.</p>
+          <div class="checkbox-group" id="apartmentServices">
+            <label class="checkbox-item"><input type="checkbox" value="streeteasy"> StreetEasy</label>
+            <label class="checkbox-item"><input type="checkbox" value="zillow"> Zillow</label>
+            <label class="checkbox-item"><input type="checkbox" value="renthop"> Rent Hop</label>
+            <label class="checkbox-item"><input type="checkbox" value="other"> Local broker / Other</label>
+          </div>
+          <div class="conditional-field" id="apartmentOtherField" style="display: none;">
+            <div class="form-group">
+              <label for="apartmentOtherText">Please specify</label>
+              <input type="text" id="apartmentOtherText" placeholder="Name of local broker or service">
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Step 7: Transportation -->

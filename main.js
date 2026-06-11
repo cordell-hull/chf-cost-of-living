@@ -59,7 +59,12 @@ const report = {
     twoBedNearSchool: 0,
     cellphone: 0,
     internet: 0,
-    electricity: 0
+    electricity: 0,
+    relocationHired: null,
+    relocationCompany: '',
+    relocationEmail: '',
+    apartmentServices: [],
+    apartmentOther: ''
   },
   transportation: {
     singleRide: 0,
@@ -206,8 +211,22 @@ function _restoreDraft(draft) {
   document.getElementById('cellphone').value = formatCurrency(report.housing.cellphone);
   document.getElementById('internet').value = formatCurrency(report.housing.internet);
   document.getElementById('electricity').value = formatCurrency(report.housing.electricity);
+  if (report.housing.relocationHired !== null) {
+    _setToggle('relocationToggle', report.housing.relocationHired ? 'yes' : 'no');
+  }
+  document.getElementById('relocationCompany').value = report.housing.relocationCompany || '';
+  document.getElementById('relocationEmail').value = report.housing.relocationEmail || '';
+  if (report.housing.apartmentServices && report.housing.apartmentServices.length) {
+    document.getElementById('apartmentServices').querySelectorAll('input').forEach(cb => {
+      cb.checked = report.housing.apartmentServices.includes(cb.value);
+    });
+    if (report.housing.apartmentServices.includes('other')) {
+      document.getElementById('apartmentOtherField').style.display = 'block';
+    }
+  }
+  document.getElementById('apartmentOtherText').value = report.housing.apartmentOther || '';
 
-  // Restore Step 6
+  // Restore Step 7
   document.getElementById('singleRide').value = formatCurrency(report.transportation.singleRide);
   document.getElementById('monthlyPass').value = formatCurrency(report.transportation.monthlyPass);
   document.getElementById('leaseCost').value = formatCurrency(report.transportation.leaseCost);
@@ -339,6 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSchoolNameListener();
   initCurrencyInputs();
   initPhoneFormatting();
+  initApartmentServices();
   document.getElementById('generatePdfBtn').addEventListener('click', generateReport);
 
   renderFoodItems();
@@ -371,6 +391,15 @@ function initPhoneFormatting() {
     const digits = e.target.value.replace(/\D/g, '');
     if (digits.length === 10) {
       e.target.value = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+    }
+  });
+}
+
+function initApartmentServices() {
+  document.getElementById('apartmentServices').addEventListener('change', (e) => {
+    if (e.target.value === 'other') {
+      document.getElementById('apartmentOtherField').style.display =
+        e.target.checked ? 'block' : 'none';
     }
   });
 }
@@ -467,7 +496,8 @@ function _updateConditionalFields() {
     ['broadwayToggle', 'broadwayField', ['available', 'local']],
     ['baseballToggle', 'baseballField', ['available', 'local']],
     ['basketballToggle', 'basketballField', ['available', 'local']],
-    ['hockeyToggle', 'hockeyField', ['available', 'local']]
+    ['hockeyToggle', 'hockeyField', ['available', 'local']],
+    ['relocationToggle', 'relocationDetailsField', 'yes']
   ];
 
   for (const [toggleId, fieldId, showValue] of mappings) {
@@ -602,8 +632,15 @@ function syncFormToState() {
   report.housing.cellphone = parseCurrency(document.getElementById('cellphone').value);
   report.housing.internet = parseCurrency(document.getElementById('internet').value);
   report.housing.electricity = parseCurrency(document.getElementById('electricity').value);
+  const relToggle = _getToggleValue('relocationToggle');
+  report.housing.relocationHired = relToggle === 'yes' ? true : relToggle === 'no' ? false : null;
+  report.housing.relocationCompany = document.getElementById('relocationCompany').value.trim();
+  report.housing.relocationEmail = document.getElementById('relocationEmail').value.trim();
+  report.housing.apartmentServices = Array.from(document.getElementById('apartmentServices')
+    .querySelectorAll('input:checked')).map(cb => cb.value);
+  report.housing.apartmentOther = document.getElementById('apartmentOtherText').value.trim();
 
-  // Step 6: Transportation
+  // Step 7: Transportation
   report.transportation.singleRide = parseCurrency(document.getElementById('singleRide').value);
   report.transportation.monthlyPass = parseCurrency(document.getElementById('monthlyPass').value);
   report.transportation.leaseCost = parseCurrency(document.getElementById('leaseCost').value);
