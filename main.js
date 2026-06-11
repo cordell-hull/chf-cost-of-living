@@ -221,7 +221,7 @@ function _restoreDraft(draft) {
       cb.checked = report.housing.apartmentServices.includes(cb.value);
     });
     if (report.housing.apartmentServices.includes('other')) {
-      document.getElementById('apartmentOtherField').style.display = 'block';
+      document.getElementById('apartmentOtherField').classList.add('visible');
     }
   }
   document.getElementById('apartmentOtherText').value = report.housing.apartmentOther || '';
@@ -398,8 +398,7 @@ function initPhoneFormatting() {
 function initApartmentServices() {
   document.getElementById('apartmentServices').addEventListener('change', (e) => {
     if (e.target.value === 'other') {
-      document.getElementById('apartmentOtherField').style.display =
-        e.target.checked ? 'block' : 'none';
+      document.getElementById('apartmentOtherField').classList.toggle('visible', e.target.checked);
     }
   });
 }
@@ -880,6 +879,8 @@ function validateHousing() {
   } else {
     clearError('utilityError');
   }
+
+  if (!_requireToggle('relocationToggle', 'relocationError', 'Please select Yes or No.')) valid = false;
 
   return valid;
 }
