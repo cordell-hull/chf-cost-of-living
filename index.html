@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cost of Living Estimate - Cordell Hull Foundation</title>
   <link rel="icon" type="image/jpeg" href="./assets/logo.jpeg">
-  <link rel="stylesheet" href="styles.css?v=2.6.0">
+  <link rel="stylesheet" href="styles.css?v=2.7.0">
 </head>
 <body>
   <div class="app-container">
@@ -154,12 +154,22 @@
         </div>
 
         <div class="form-group">
-          <label for="insurancePremiumEstimate">Monthly estimate of health insurance premium <span class="required">*</span></label>
-          <div class="input-with-prefix">
-            <span class="prefix">$</span>
-            <input type="text" inputmode="decimal" id="insurancePremiumEstimate" placeholder="50">
+          <label>Monthly estimate of health insurance premium <span class="required">*</span></label>
+          <div class="toggle-group" id="premiumEstimateToggle">
+            <button type="button" class="toggle-btn" data-value="paid">Teacher pays a premium</button>
+            <button type="button" class="toggle-btn" data-value="zero">ZERO — school pays for your health insurance</button>
           </div>
           <span class="field-error" id="premiumEstimateError"></span>
+
+          <div class="conditional-field" id="premiumEstimateField">
+            <div class="form-group">
+              <label for="insurancePremiumEstimate">Monthly premium amount <span class="required">*</span></label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="decimal" id="insurancePremiumEstimate" placeholder="50">
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -682,6 +692,6 @@
     </div>
   </div>
 
-  <script type="module" src="main.js?v=2.6.0"></script>
+  <script type="module" src="main.js?v=2.7.0"></script>
 </body>
 </html>

@@ -20,6 +20,7 @@ const report = {
     schoolOffers: null,
     schoolCoversFullCost: null,
     monthlyCostToTeacher: 0,
+    schoolPaysPremium: null,
     monthlyPremiumEstimate: 0,
     j2DependentCost: 0,
     j2Offered: true
@@ -175,6 +176,9 @@ function _restoreDraft(draft) {
     _setToggle('insuranceCostToggle', report.healthInsurance.schoolCoversFullCost ? 'free' : 'paid');
   }
   document.getElementById('insuranceMonthlyCost').value = formatCurrency(report.healthInsurance.monthlyCostToTeacher);
+  if (report.healthInsurance.schoolPaysPremium !== null) {
+    _setToggle('premiumEstimateToggle', report.healthInsurance.schoolPaysPremium ? 'zero' : 'paid');
+  }
   document.getElementById('insurancePremiumEstimate').value = formatCurrency(report.healthInsurance.monthlyPremiumEstimate);
   _setToggle('j2DependentToggle', report.healthInsurance.j2Offered ? 'offered' : 'not-offered');
   document.getElementById('j2DependentCost').value = formatCurrency(report.healthInsurance.j2DependentCost);
@@ -461,7 +465,7 @@ function _activateToggle(group, activeBtn) {
   });
 
   const value = activeBtn.dataset.value;
-  const isPositive = ['yes', 'offered', 'paid', 'has-tax', 'needed', 'has-fees', 'available', 'local', 'school'].includes(value);
+  const isPositive = ['yes', 'offered', 'paid', 'zero', 'has-tax', 'needed', 'has-fees', 'available', 'local', 'school'].includes(value);
   activeBtn.classList.add(isPositive ? 'active-yes' : 'active-no');
   group.classList.remove('toggle-error');
 }
@@ -487,6 +491,7 @@ function _updateConditionalFields() {
   const mappings = [
     ['schoolOffersInsurance', 'insuranceCostField', 'yes'],
     ['insuranceCostToggle', 'insurancePremiumField', 'paid'],
+    ['premiumEstimateToggle', 'premiumEstimateField', 'paid'],
     ['j2DependentToggle', 'j2CostField', 'offered'],
     ['stateTaxToggle', 'stateTaxField', 'has-tax'],
     ['eduEvalToggle', 'eduEvalField', 'needed'],
@@ -597,7 +602,9 @@ function syncFormToState() {
   const costToggle = _getToggleValue('insuranceCostToggle');
   report.healthInsurance.schoolCoversFullCost = costToggle === 'free';
   report.healthInsurance.monthlyCostToTeacher = costToggle === 'free' ? 0 : parseCurrency(document.getElementById('insuranceMonthlyCost').value);
-  report.healthInsurance.monthlyPremiumEstimate = parseCurrency(document.getElementById('insurancePremiumEstimate').value);
+  const premToggle = _getToggleValue('premiumEstimateToggle');
+  report.healthInsurance.schoolPaysPremium = premToggle === 'zero';
+  report.healthInsurance.monthlyPremiumEstimate = premToggle === 'zero' ? 0 : parseCurrency(document.getElementById('insurancePremiumEstimate').value);
   report.healthInsurance.j2Offered = _getToggleValue('j2DependentToggle') === 'offered';
   report.healthInsurance.j2DependentCost = parseCurrency(document.getElementById('j2DependentCost').value);
 
@@ -792,7 +799,11 @@ function validateInsurance() {
     }
   }
 
-  if (!_requireCurrency('insurancePremiumEstimate', 'premiumEstimateError', 'Premium estimate is required.')) valid = false;
+  if (!_requireToggle('premiumEstimateToggle', 'premiumEstimateError', 'Please select a premium option.')) {
+    valid = false;
+  } else if (!report.healthInsurance.schoolPaysPremium) {
+    if (!_requireCurrency('insurancePremiumEstimate', 'premiumEstimateError', 'Premium amount is required.')) valid = false;
+  }
 
   if (report.healthInsurance.j2Offered) {
     if (!_requireCurrency('j2DependentCost', 'j2CostError', 'Dependent cost is required.')) valid = false;
@@ -1029,7 +1040,7 @@ function renderReview() {
       <h3>Health Insurance</h3>
       <div class="review-field"><span class="review-label">School offers insurance</span><span class="review-value">${r.healthInsurance.schoolOffers === true ? '<span style="color:var(--color-success)">Yes</span>' : r.healthInsurance.schoolOffers === false ? '<span style="color:var(--color-error)">No</span>' : '—'}</span></div>
       ${r.healthInsurance.schoolOffers ? `<div class="review-field"><span class="review-label">Cost to teacher</span><span class="review-value">${r.healthInsurance.schoolCoversFullCost ? '<span style="color:var(--color-success)">School covers the full cost</span>' : `$${formatCurrency(r.healthInsurance.monthlyCostToTeacher)}/mo`}</span></div>` : ''}
-      ${r.healthInsurance.monthlyPremiumEstimate ? `<div class="review-field"><span class="review-label">Monthly premium estimate</span><span class="review-value">$${formatCurrency(r.healthInsurance.monthlyPremiumEstimate)}</span></div>` : ''}
+      <div class="review-field"><span class="review-label">Monthly premium</span><span class="review-value">${r.healthInsurance.schoolPaysPremium ? 'ZERO — school pays for your health insurance' : `$${formatCurrency(r.healthInsurance.monthlyPremiumEstimate)}`}</span></div>
       <div class="review-field"><span class="review-label">J-2 Dependent coverage</span><span class="review-value">${r.healthInsurance.j2Offered ? (r.healthInsurance.j2DependentCost ? `$${formatCurrency(r.healthInsurance.j2DependentCost)}/mo` : 'Offered') : '<span style="color:var(--color-error)">Not offered</span>'}</span></div>
     </div>
 
